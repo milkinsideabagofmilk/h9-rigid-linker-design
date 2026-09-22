@@ -1,0 +1,35 @@
+<ROSETTASCRIPTS>
+  <SCOREFXNS>
+    <!-- metrics must exclude constraint energy for apples-to-apples comparison -->
+    <ScoreFunction name="ref2015_nocst" weights="ref2015">
+      <Reweight scoretype="coordinate_constraint" weight="0"/>
+    </ScoreFunction>
+    <ScoreFunction name="ref2015_relax" weights="ref2015">
+      <Reweight scoretype="coordinate_constraint" weight="1.0"/>
+    </ScoreFunction>
+  </SCOREFXNS>
+  <RESIDUE_SELECTORS>
+    <Index name="linkers" resnums="47-66,240-259,433-452"/>
+    <Index name="linker_flanks" resnums="44-69,237-262,430-455"/>
+    <True name="all"/>
+  </RESIDUE_SELECTORS>
+  <SIMPLE_METRICS>
+    <TotalEnergyMetric name="pre_linker_total" scorefxn="ref2015_nocst" residue_selector="linkers" custom_type="pre_linker"/>
+    <TotalEnergyMetric name="pre_linker_flank_total" scorefxn="ref2015_nocst" residue_selector="linker_flanks" custom_type="pre_linker_flank"/>
+    <TotalEnergyMetric name="post_linker_total" scorefxn="ref2015_nocst" residue_selector="linkers" custom_type="post_linker"/>
+    <TotalEnergyMetric name="post_linker_flank_total" scorefxn="ref2015_nocst" residue_selector="linker_flanks" custom_type="post_linker_flank"/>
+  </SIMPLE_METRICS>
+  <MOVERS>
+    <RunSimpleMetrics name="run_pre" metrics="pre_linker_total,pre_linker_flank_total"/>
+    <AddConstraintsToCurrentConformationMover name="add_csts" CA_only="true" coord_dev="0.5" residue_selector="all"/>
+    <FastRelax name="frlx" scorefxn="ref2015_relax" repeats="1"/>
+    <RunSimpleMetrics name="run_post" metrics="post_linker_total,post_linker_flank_total"/>
+  </MOVERS>
+  <PROTOCOLS>
+    <Add mover="run_pre"/>
+    <Add mover="add_csts"/>
+    <Add mover="frlx"/>
+    <Add mover="run_post"/>
+  </PROTOCOLS>
+  <OUTPUT scorefxn="ref2015_nocst"/>
+</ROSETTASCRIPTS>
