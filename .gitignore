@@ -1,0 +1,9 @@
+# never commit large design outputs / model weights / caches
+*.a3m
+*.trb
+*.npz
+hydra_runs/
+traj/
+__pycache__/
+*.pyc
+.DS_Store
